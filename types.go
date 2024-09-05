@@ -1,5 +1,7 @@
 package urchain
 
+import "github.com/btcsuite/btcd/chaincfg/chainhash"
+
 type Balance struct {
 	Confirmed   string `json:"confirmed"`
 	Unconfirmed string `json:"unconfirmed"`
@@ -8,21 +10,26 @@ type Balance struct {
 type Utxo struct {
 	Address     string `json:"address"`
 	TxId        string `json:"txId"`
-	OutputIndex int    `json:"outputIndex"`
-	Height      int    `json:"height"`
-	ScriptHash  string `json:"scriptHash"`
+	OutputIndex uint32 `json:"outputIndex"`
+	Height      int64  `json:"height"`
+	ScriptHash  string `json:"tokenAddressScriptHash"`
 	Script      string `json:"script"`
-	Satoshis    int    `json:"satoshis"`
+	Satoshis    int64  `json:"satoshis"`
 	Type        string `json:"type"`
-	Time        int    `json:"time"`
+	Time        int64  `json:"time"`
+}
+
+func (o *Utxo) GetTxidHash() *chainhash.Hash {
+	hash, _ := chainhash.NewHashFromStr(o.TxId)
+	return hash
 }
 
 type TxHistory struct {
 	TxId     string `json:"txId"`
-	Satoshis int    `json:"satoshis"`
+	Satoshis int64  `json:"satoshis"`
 	Income   bool   `json:"income"`
-	Height   int    `json:"height"`
-	Time     int    `json:"time"`
+	Height   int64  `json:"height"`
+	Time     int64  `json:"time"`
 }
 
 type NoteTxHistory struct {
@@ -31,9 +38,9 @@ type NoteTxHistory struct {
 	Income      bool   `json:"income"`
 	Tick        string `json:"tick"`
 	Op          string `json:"op"`
-	Dec         int    `json:"dec"`
-	Height      int    `json:"height"`
-	Time        int    `json:"time"`
+	Dec         int32  `json:"dec"`
+	Height      int64  `json:"height"`
+	Time        int64  `json:"time"`
 	FromAddress string `json:"fromAddress"`
 	ToAddress   string `json:"toAddress"`
 }
@@ -51,7 +58,7 @@ type BroadcastResult struct {
 
 type BlockHeader struct {
 	Hash   string `json:"hash"`
-	Height int    `json:"height"`
+	Height int64  `json:"height"`
 }
 
 type TokenBalance struct {
@@ -62,8 +69,8 @@ type TokenBalance struct {
 
 type Token struct {
 	*TokenBalance
-	ScriptHash string `json:"scriptHash"`
-	Dec        int    `json:"dec"`
+	ScriptHash string `json:"tokenAddressScriptHash"`
+	Dec        int32  `json:"dec"`
 	P          string `json:"p"`
 }
 
@@ -72,9 +79,9 @@ type N20TokenInfo struct {
 	Blockchain    string `json:"blockchain"`
 	TxId          string `json:"txId"`
 	InputIndex    int    `json:"inputIndex"`
-	Height        int    `json:"height"`
+	Height        int64  `json:"height"`
 	BlockHash     string `json:"blockHash"`
-	BlockTime     int    `json:"blockTime"`
+	BlockTime     int64  `json:"blockTime"`
 	IndexInBlock  int    `json:"indexInBlock"`
 	IndexInChain  int    `json:"indexInChain"`
 	AccountId     string `json:"accountId"`
@@ -83,13 +90,14 @@ type N20TokenInfo struct {
 	Tick          string `json:"tick"`
 	Max           string `json:"max"`
 	Lim           string `json:"lim"`
-	Dec           int    `json:"dec"`
+	Dec           int32  `json:"dec"`
 	Uri           string `json:"uri"`
 	Idx           string `json:"idx"`
 	Code          string `json:"code"`
 	Sch           string `json:"sch"`
-	Time          int    `json:"time"`
+	Time          int64  `json:"time"`
 	DeployOptions string `json:"deployOptions"`
+	Total         string `json:"total"`
 }
 
 type N20TokenInfoResp struct {
@@ -103,15 +111,15 @@ type NoteContract struct {
 	Blockchain   string `json:"blockchain"`
 	TxId         string `json:"txId"`
 	InputIndex   int    `json:"inputIndex"`
-	Height       int    `json:"height"`
+	Height       int64  `json:"height"`
 	BlockHash    string `json:"blockHash"`
-	BlockTime    int    `json:"blockTime"`
+	BlockTime    int64  `json:"blockTime"`
 	IndexInBlock int    `json:"indexInBlock"`
 	IndexInChain int    `json:"indexInChain"`
 	Name         string `json:"name"`
 	Code         string `json:"code"`
 	AccountId    string `json:"accountId"`
-	Time         int    `json:"time"`
+	Time         int64  `json:"time"`
 	Status       string `json:"status"`
 	AbiJson      any    `json:"abiJson"`
 	Creater      string `json:"creater"`
@@ -119,33 +127,33 @@ type NoteContract struct {
 
 type Health struct {
 	Status              string `json:"status"`
-	LastHealthChecktime int    `json:"lastHealthChecktime"`
-	Height              int    `json:"height"`
+	LastHealthChecktime int64  `json:"lastHealthChecktime"`
+	Height              int64  `json:"height"`
 	Merkleroot          string `json:"merkleroot"`
 }
 
 type TokenUtxo struct {
 	TxId        string `json:"txId"`
 	Outpoint    string `json:"outpoint"`
-	OutputIndex int    `json:"outputIndex"`
+	OutputIndex uint32 `json:"outputIndex"`
 	Script      string `json:"script"`
-	Satoshis    int    `json:"satoshis"`
+	Satoshis    int64  `json:"satoshis"`
 	Holder      string `json:"holder"`
 	Amount      string `json:"amount"`
-	Height      int    `json:"height"`
+	Height      int64  `json:"height"`
 	Tick        string `json:"tick"`
-	Dec         int    `json:"dec"`
+	Dec         int32  `json:"dec"`
 	P           string `json:"p"`
-	Time        int    `json:"time"`
+	Time        int64  `json:"time"`
 }
 
 type Block struct {
 	Hash              string `json:"hash"`
-	Height            int    `json:"height"`
+	Height            int64  `json:"height"`
 	Version           int    `json:"version"`
 	VersionHex        string `json:"versionHex"`
-	Time              int    `json:"time"`
-	Mediantime        int    `json:"mediantime"`
+	Time              int64  `json:"time"`
+	Mediantime        int64  `json:"mediantime"`
 	Nonce             string `json:"nonce"`
 	Bits              string `json:"bits"`
 	Difficulty        string `json:"difficulty"`
@@ -167,12 +175,12 @@ type Block struct {
 type NoteTx struct {
 	TxId         string `json:"txId"`
 	Blockchain   string `json:"blockchain"`
-	Time         int    `json:"time"`
+	Time         int64  `json:"time"`
 	NumInputs    int    `json:"num_inputs"`
 	NumOutputs   int    `json:"num_outputs"`
-	Height       int    `json:"height"`
+	Height       int64  `json:"height"`
 	BlockHash    string `json:"blockHash"`
-	BlockTime    int    `json:"blockTime"`
+	BlockTime    int64  `json:"blockTime"`
 	IndexInBlock int    `json:"indexInBlock"`
 	IndexInChain int    `json:"indexInChain"`
 	Status       string `json:"status"`
@@ -196,15 +204,15 @@ type NotePayload struct {
 type utxoInfo struct {
 	TxId         string       `json:"txId"`
 	Outpoint     string       `json:"outpoint"`
-	OutputIndex  int          `json:"outputIndex"`
+	OutputIndex  uint32       `json:"outputIndex"`
 	Script       string       `json:"script"`
-	Height       int          `json:"height"`
+	Height       int64        `json:"height"`
 	Tick         string       `json:"tick,omitempty"`
 	P            string       `json:"p,omitempty"`
-	Dec          int          `json:"dec,omitempty"`
-	Time         int          `json:"time"`
+	Dec          int32        `json:"dec,omitempty"`
+	Time         int64        `json:"time"`
 	BlockHash    string       `json:"blockHash"`
-	BlockTime    int          `json:"blockTime"`
+	BlockTime    int64        `json:"blockTime"`
 	IndexInBlock int          `json:"indexInBlock"`
 	IndexInChain int          `json:"indexInChain"`
 	Blockchain   string       `json:"blockchain,omitempty"`
@@ -230,7 +238,7 @@ type Txo struct {
 	Satoshis   string `json:"satoshis"`
 	Holder     string `json:"holder,omitempty"`
 	Size       int    `json:"size"`
-	ScriptHash string `json:"scriptHash"`
+	ScriptHash string `json:"tokenAddressScriptHash"`
 	Type       string `json:"type"`
 	Pubkey     string `json:"pubkey"`
 	Address    string `json:"address"`
@@ -240,24 +248,24 @@ type Txo struct {
 type NoteTxInfo struct {
 	TxId           string `json:"txId"`
 	Blockchain     string `json:"blockchain"`
-	Time           int    `json:"time"`
+	Time           int64  `json:"time"`
 	NumInputs      int    `json:"num_inputs"`
 	NumOutputs     int    `json:"num_outputs"`
-	Height         int    `json:"height"`
+	Height         int64  `json:"height"`
 	BlockHash      string `json:"blockHash"`
-	BlockTime      int    `json:"blockTime"`
+	BlockTime      int64  `json:"blockTime"`
 	IndexInBlock   int    `json:"indexInBlock"`
 	IndexInChain   int    `json:"indexInChain"`
 	Status         string `json:"status"`
 	Type           string `json:"type"`
 	Payload        string `json:"payload"`
 	Version        int    `json:"version"`
-	NLockTime      int    `json:"nLockTime"`
+	NLockTime      int64  `json:"nLockTime"`
 	TxSize         int    `json:"txSize"`
 	Fee            any    `json:"fee"`
 	OutputSatoshis string `json:"outputSatoshis"`
 	TxHex          string `json:"txHex"`
-	MempoolTime    int    `json:"mempoolTime"`
+	MempoolTime    int64  `json:"mempoolTime"`
 	Rbf            bool   `json:"rbf"`
 	Replaced       any    `json:"replaced"`
 
